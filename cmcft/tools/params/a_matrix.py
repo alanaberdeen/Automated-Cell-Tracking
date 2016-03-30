@@ -58,6 +58,9 @@ def build_coupled_edges(g, nodelist):
     #
     # Outputs:  new_edges   - list of edges to add
 
+    # Initialise list of new edges
+    new_edges = []
+
     # Loop through nodes
     for node in nodelist:
         if 'M' in node or 'S' in node:
@@ -65,19 +68,22 @@ def build_coupled_edges(g, nodelist):
             # sets of neighbouring nodes is split/merge is in solution
             fixed_set, cycle_set = couple_node_sets(g, node)
 
-            fixed_edge = np.zeros((len(nodelist),1))
+            fixed_edge = [0] * len(nodelist)
             for f in fixed_set:
                 fixed_edge[nodelist.index(f[0])] = f[1]
 
             for c in cycle_set:
-                coupled_edge = np.copy(fixed_edge)
+                coupled_edge = list(fixed_edge)
                 coupled_edge[nodelist.index(c[0])] = c[1]
                 try:
-                    new_edges = np.hstack((new_edges, coupled_edge))
+                    new_edges.append(coupled_edge)
                 except UnboundLocalError:
-                    new_edges = coupled_edge.copy()
+                    new_edges = list(coupled_edge)
 
-    return new_edges
+    new_array = np.asarray(new_edges)
+    new_array = np.transpose(new_array)
+
+    return new_array
 
 
 def couple_node_sets(g, node):
@@ -153,7 +159,7 @@ def reduce_to_coupled(a_extra, nodelist):
 
 def adjust_capacity_edges(a_dense, nodelist):
 
-    # adjust_capactiy_edges
+    # adjust_capacity_edges
     # Account for the larger capacity edges in the graph by appending the
     # specific edges to the matrix the required amount of times.
     #
@@ -173,10 +179,10 @@ def adjust_capacity_edges(a_dense, nodelist):
     r_nodes = sum(1 for x in couple_vertices if 'R' in x)
 
     # Edge indices connected to nodes
-    source_e = np.nonzero(a_dense[couple_vertices.index('T+'),:])[1]
-    a_e = np.nonzero(a_dense[couple_vertices.index('A'),:])[1]
-    d_e = np.nonzero(a_dense[couple_vertices.index('D'),:])[1]
-    sink_e = np.nonzero(a_dense[couple_vertices.index('T-'),:])[1]
+    source_e = np.nonzero(a_dense[couple_vertices.index('T+'), :])[1]
+    a_e = np.nonzero(a_dense[couple_vertices.index('A'), :])[1]
+    d_e = np.nonzero(a_dense[couple_vertices.index('D'), :])[1]
+    sink_e = np.nonzero(a_dense[couple_vertices.index('T-'), :])[1]
 
     # Edges
     source_a = set(source_e).intersection(a_e).pop()
@@ -185,7 +191,7 @@ def adjust_capacity_edges(a_dense, nodelist):
 
     # Add Edges appropriate number of times
     for x in xrange(1, r_nodes):
-        a_cap = np.hstack((a_cap, a_cap[:,source_a]))
+        a_cap = np.hstack((a_cap, a_cap[:, source_a]))
 
     for x in xrange(1, l_nodes):
         a_cap = np.hstack((a_cap, a_cap[:, a_d]))

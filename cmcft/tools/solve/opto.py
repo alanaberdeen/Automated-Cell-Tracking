@@ -15,9 +15,27 @@ def opto(a_coup, b_flow, c_cost):
     #           b_flow      -   sum of flow for each vertex
     #           c_cost      -   vector of edge costs
     #
-    # Output:   x - binary |E|x1 solution vector that is 1 if the row is in
-    #               the solution and 0 otherwise.
+    # Outputs:  sol         -   solution vector
     #
+
+    # build model
+    model = model_construct(a_coup, b_flow, c_cost)
+
+    # solve
+    sol = solve(model)
+
+    return sol
+
+
+def model_construct(a_coup, b_flow, c_cost):
+
+    # construct pyomo model
+    #
+    # Inputs:   a_coup      -   coupled incidence matrix
+    #           b_flow      -   sum of flow for each vertex
+    #           c_cost      -   vector of edge costs
+    #
+    # Outputs:  model       -   pyomo model object
 
     # Creation of a Concrete Model
     model = ConcreteModel()
@@ -30,25 +48,20 @@ def opto(a_coup, b_flow, c_cost):
 
     # Define parameters
     # Table a(i,j)  coupled incidence matrix
-    incidence = {}
-    for row in xrange(a_coup.shape[0]):
-        for column in xrange(a_coup.shape[1]):
-            incidence[(row, column)] = a_coup.item((row, column))
-
-    model.a = Param(model.i, model.j, initialize=incidence,
+    def A_init(model, i, j):
+        return a_coup.item(i, j)
+    model.a = Param(model.i, model.j, initialize=A_init,
                     doc='coupled incidence')
 
     # cost vector
-    costs = {}
-    for index, value in enumerate(c_cost):
-        costs[index] = value
-    model.c = Param(model.j, initialize=costs, doc='cost vector')
+    def c_init(model, j):
+        return c_cost[j]
+    model.c = Param(model.j, initialize=c_init, doc='cost vector')
 
     # flow vector
-    flow = {}
-    for index, value in enumerate(b_flow):
-        flow[index] = value
-    model.b = Param(model.i, initialize=flow, doc='flow vector')
+    def b_init(model, i):
+        return b_flow[i]
+    model.b = Param(model.i, initialize=b_init, doc='flow vector')
 
     # Define variables
     model.x = Var(model.j, domain=Binary,
@@ -61,15 +74,21 @@ def opto(a_coup, b_flow, c_cost):
                                  doc='Flow Constraints')
 
     # Define Objective
-    def objective_rule(model):
-        return sum(model.c[j]*model.x[j] for j in model.j)
-    model.objective = Objective(rule=objective_rule, sense=minimize,
+    obj_expr = sum(model.c[j]*model.x[j] for j in model.j)
+    model.objective = Objective(expr=obj_expr, sense=minimize,
                                 doc='Define objective function')
 
-    # Display of the output
-    # Display x.l, x.m ;
-    # def pyomo_postprocess(options=None, instance=None, results=None):
-        #model.x.display()
+    return model
+
+
+def solve(model):
+
+    # solve
+    # calls the GLPK solver and finds solution
+    #
+    # Inputs:   model   -   Pyomo model object
+    # Outputs:  x       -   binary |E|x1 solution vector that is 1 if the
+    #                       row is in the solution and 0 otherwise.
 
     # This is an optional code path that allows the script to be
     # run outside of pyomo command-line.  For example:  python transport.py
@@ -77,10 +96,6 @@ def opto(a_coup, b_flow, c_cost):
     from pyomo.opt import SolverFactory
     opt = SolverFactory("glpk")
     results = opt.solve(model)
-
-    # sends results to stdout
-    #results.write()
-    #pyomo_postprocess(None, instance, results)
 
     # save results
     model.solutions.load_from(results)

@@ -4,24 +4,28 @@
 
 # Import external packages
 import glob
-import os
 
 # Import function packages
 from tools import solve, output, graph, params
 
 
-def track_cmcf(img_path, save_path=None, annotated=None, csv=None):
+def track(img_path, w=110, prune=(0.5, 0.2),
+          save_path=None, annotated=False, csv=False):
 
-    # TODO: tracking edge weight parameter 'w' should be explicit input
-
-    # track_cmcf
+    # track
     # tracking function. Loops through sets of image files. For each pair,
     # graph structure is created, transformed to coupled matrix, solved and
     # output updated.
     #
     # Inputs:   img_path    -  path to directory containing image files
-    #           save_path   -  if required, specified directory to
-    #                          save annotate image files.
+    #           w           -  feature weights (set empirically)
+    #           prune       -  pruning parameters (alpha, beta)
+    #                          alpha: fraction of edges to retain
+    #                          beta: fraction split/merge vertices to retain
+    #           save_path   -  path to directory for saved output
+    #           annotated   -  option to save annotated images of cell tracks
+    #           csv         -  option to save csv of output
+    #
     #
     # Outputs:  tracks      -  Output data structure for cell tracks.
     #                          List of lists.
@@ -35,9 +39,10 @@ def track_cmcf(img_path, save_path=None, annotated=None, csv=None):
     # List of images in directory
     img_files = glob.glob(img_path + '/*.tif')
 
+    # Initialise output
     output_data = None
 
-    # For pairs of images in directory
+    # For pairs of image frames
     for i, img in enumerate(img_files):
         if i < (len(img_files)-1):
 
@@ -46,12 +51,15 @@ def track_cmcf(img_path, save_path=None, annotated=None, csv=None):
             r_img = img_files[i+1]
 
             # Initialise graph
-            g = graph.construct(l_img, r_img)
+            g = graph.construct(l_img, r_img, w=w, beta=prune[1])
+
+            # Prune graph
+            g = graph.prune(g, alpha=prune[0])
 
             # Initialise output
             if not output_data:
                 output_data = output.initialise(g.node)
-                if save_path:
+                if annotated:
                     output.overlay(output_data, l_img, save_path)
 
             # Create the coupled incidence matrix.
@@ -65,10 +73,8 @@ def track_cmcf(img_path, save_path=None, annotated=None, csv=None):
             # Update output
             output_data = output.update(g, a_coup, x, output_data, a_vertices)
 
-            # print output for quick testing 
-            print('Frame number: ' + str(i))
-            #for cell_id, line in enumerate(output_data):
-            #   print(('cell id ' + str(cell_id) + ' ---> '), line)
+            # print frame number to track progress
+            print('Tracked frame number: ' + str(i))
 
             # If required, annotate images
             if annotated:

@@ -48,9 +48,9 @@ def model_construct(a_coup, b_flow, c_cost):
 
     # Define parameters
     # Table a(i,j)  coupled incidence matrix
-    def A_init(model, i, j):
+    def a_init(model, i, j):
         return a_coup.item(i, j)
-    model.a = Param(model.i, model.j, initialize=A_init,
+    model.a = Param(model.i, model.j, initialize=a_init,
                     doc='coupled incidence')
 
     # cost vector
@@ -91,8 +91,8 @@ def solve(model):
     #                       row is in the solution and 0 otherwise.
 
     # This is an optional code path that allows the script to be
-    # run outside of pyomo command-line.  For example:  python transport.py
-    # This replicates what the pyomo command-line tools does
+    # run outside of Pyomo command-line.  For example:  python transport.py
+    # This replicates what the Pyomo command-line tools does
     from pyomo.opt import SolverFactory
     opt = SolverFactory("glpk")
     results = opt.solve(model)

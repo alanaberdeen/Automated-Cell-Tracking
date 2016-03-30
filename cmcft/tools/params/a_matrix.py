@@ -58,6 +58,9 @@ def build_coupled_edges(g, nodelist):
     #
     # Outputs:  new_edges   - list of edges to add
 
+    # Initialise list of new edges
+    new_edges = []
+
     # Loop through nodes
     for node in nodelist:
         if 'M' in node or 'S' in node:
@@ -65,19 +68,22 @@ def build_coupled_edges(g, nodelist):
             # sets of neighbouring nodes is split/merge is in solution
             fixed_set, cycle_set = couple_node_sets(g, node)
 
-            fixed_edge = np.zeros((len(nodelist),1))
+            fixed_edge = [0] * len(nodelist)
             for f in fixed_set:
                 fixed_edge[nodelist.index(f[0])] = f[1]
 
             for c in cycle_set:
-                coupled_edge = np.copy(fixed_edge)
+                coupled_edge = list(fixed_edge)
                 coupled_edge[nodelist.index(c[0])] = c[1]
                 try:
-                    new_edges = np.hstack((new_edges, coupled_edge))
+                    new_edges.append(coupled_edge)
                 except UnboundLocalError:
-                    new_edges = coupled_edge.copy()
+                    new_edges = list(coupled_edge)
 
-    return new_edges
+    new_array = np.asarray(new_edges)
+    new_array = np.transpose(new_array)
+
+    return new_array
 
 
 def couple_node_sets(g, node):

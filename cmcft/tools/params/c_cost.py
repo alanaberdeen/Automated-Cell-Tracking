@@ -8,6 +8,7 @@ __all__ = ["c_cost"]
 
 def c_cost(g, a_coup, a_vertices):
 
+    # TODO: think this function is slow. Check for performance increases.
     # c_cost
     # creates vector of costs for edges
     #
@@ -21,24 +22,22 @@ def c_cost(g, a_coup, a_vertices):
     # Initialise cost vector
     c = []
 
-    # For all edges in coupled matrix
-    for e in xrange(a_coup.shape[1]):
+    # For all edges in coupled matrix (iterating over transpose)
+    for e in a_coup.T:
 
         # Get vertices connected by edge
-        vertex_indices = np.nonzero(a_coup[:, e])[0]
-        vertices = [a_vertices[i] for i in vertex_indices]
+        vertex_indices = np.nonzero(e)
+        vertices = [a_vertices[i] for i in vertex_indices[1]]
 
         # Get weights
         weights = []
 
         # For simple edges
         if len(vertices) == 2:
-            for v in vertices:
-                try:
-                    connect = set(g.edge[v]).intersection(vertices).pop()
-                    weights.append(g.edge[v][connect]['weight'])
-                except KeyError:
-                    pass
+            try:
+                weights.append(g[vertices[0]][vertices[1]]['weight'])
+            except KeyError:
+                weights.append(g[vertices[1]][vertices[0]]['weight'])
 
         # For coupled edges
         elif len(vertices) == 4:
@@ -56,7 +55,7 @@ def c_cost(g, a_coup, a_vertices):
                     weights.append(g.edge[ms_node][v]['weight'])
 
         # Calc costs
-        edge_cost = sum(w for w in weights)
+        edge_cost = sum(weights)
 
         # Add to cost vector
         c.append(edge_cost)

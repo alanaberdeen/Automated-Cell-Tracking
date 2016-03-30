@@ -5,7 +5,7 @@
 from cost_calcs import *
 
 
-def build(g_in):
+def build(g_in, w):
 
     # build
     # Create the edges for the graph structure. Edge weights are
@@ -13,11 +13,9 @@ def build(g_in):
     # Flow Tracking algorithm
     #
     # Inputs:   g_in    - initialised graph node structure to be built upon
+    #           w       - feature weights (set empirically)
     # Outputs:  g_out   - updated graph with the correct edges added
     #
-
-    # Set feature weights (empirically)
-    w = 110
 
     # Set edge weights from dummy nodes as no cost
     dummy_cost = 0

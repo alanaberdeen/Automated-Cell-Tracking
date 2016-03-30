@@ -12,7 +12,7 @@ import edges
 import nodes
 
 
-def construct(img1_path, img2_path, beta):
+def construct(img1_path, img2_path, w, beta):
 
     # graph
     # Create the graph structure representing the relationships between cells
@@ -20,6 +20,8 @@ def construct(img1_path, img2_path, beta):
     #
     # Inputs:   img1_path   - path to first image
     #           img2_path   - path to following image
+    #           w           - feature weights (set empirically)
+    #           beta        - fraction of split/merge events to retain
     #
     # Outputs:  g           - graphical representation of potential cell
     #                         behaviour.
@@ -38,7 +40,7 @@ def construct(img1_path, img2_path, beta):
     g = nodes.build(g, cell_stats['img1'], cell_stats['img2'], beta)
 
     # add edges
-    g = edges.build(g)
+    g = edges.build(g, w)
 
     # return g
     return g
@@ -55,7 +57,7 @@ def extract_cell_stats(img1_path, img2_path):
     # Outputs:  out -   dict containing the relevant information
     #
 
-    # TODO: be more accomodating with image types, RGB etc 
+    # TODO: be more accommodating with image types, RGB etc
     # read image data
     img1 = skimage.io.imread(img1_path)
     img2 = skimage.io.imread(img2_path)

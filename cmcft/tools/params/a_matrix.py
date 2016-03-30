@@ -131,7 +131,6 @@ def reduce_to_coupled(a_extra, nodelist):
     #
     # Outputs:  a_reduced   -   Incidence matrix without redundant edges
 
-    required_edges = set()
     edges_to_remove = set()
     required_vertices = []
 
@@ -198,12 +197,3 @@ def adjust_capacity_edges(a_dense, nodelist):
         a_cap = np.hstack((a_cap, a_cap[:, d_sink]))
 
     return a_cap
-
-
-
-
-
-
-
-
-

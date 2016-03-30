@@ -1,8 +1,5 @@
 # prune.py
 # reduce the complexity of the graph
-#
-
-import networkx
 
 
 def prune(graph, alpha):

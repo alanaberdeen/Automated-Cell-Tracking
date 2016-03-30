@@ -16,7 +16,7 @@ parent = os.path.abspath(os.path.join(cwd, '../../'))
 # --------
 # Quick test path variables for comparison
 # Test1
-images = parent + '/test_datasets/Fluo-N2DH-SIM/01_GT/SEG_test'
+images = parent + '/test_datasets/Fluo-N2DH-SIM/01_GT/SEG'
 # Test2
 #images = parent + '/test_datasets/PhC-C2DH-U373/01_GT/SEG'
 

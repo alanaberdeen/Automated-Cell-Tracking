@@ -12,7 +12,7 @@ import edges
 import nodes
 
 
-def construct(img1_path, img2_path):
+def construct(img1_path, img2_path, beta):
 
     # graph
     # Create the graph structure representing the relationships between cells
@@ -35,7 +35,7 @@ def construct(img1_path, img2_path):
     g.graph['img_shape'] = cell_stats['img_shape']
 
     # Add nodes
-    g = nodes.build(g, cell_stats['img1'], cell_stats['img2'])
+    g = nodes.build(g, cell_stats['img1'], cell_stats['img2'], beta)
 
     # add edges
     g = edges.build(g)

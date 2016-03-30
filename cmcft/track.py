@@ -46,7 +46,10 @@ def track_cmcf(img_path, save_path=None, annotated=None, csv=None):
             r_img = img_files[i+1]
 
             # Initialise graph
-            g = graph.construct(l_img, r_img)
+            g = graph.construct(l_img, r_img, beta=0.2)
+
+            # Prune graph
+            g = graph.prune(g, alpha=0.5)
 
             # Initialise output
             if not output_data:

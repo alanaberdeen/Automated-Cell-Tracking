@@ -27,37 +27,72 @@ def c_cost(g, a_coup, a_vertices):
 
         # Get vertices connected by edge
         vertex_indices = np.nonzero(e)
-        vertices = [a_vertices[i] for i in vertex_indices[1]]
+        v = [a_vertices[i] for i in vertex_indices[1]]
 
         # Get weights
-        weights = []
+        cost = 0
 
         # For simple edges
-        if len(vertices) == 2:
+        if len(v) == 2:
             try:
-                weights.append(g[vertices[0]][vertices[1]]['weight'])
+                cost = g[v[0]][v[1]]['weight']
             except KeyError:
-                weights.append(g[vertices[1]][vertices[0]]['weight'])
+                cost = g[v[1]][v[0]]['weight']
 
         # For coupled edges
-        elif len(vertices) == 4:
+        elif len(v) == 4:
 
-            # Find merge/split node that has been coupled
-            neighbours = []
-            for v in vertices:
-                neighbours.append(set(g.predecessors(v) + g.successors(v)))
-            ms_node = set.intersection(*neighbours).pop()
+            # Find merge/split event label
+            ms_node = ms_event(v, g)
 
-            for v in vertices:
+            for n in v:
                 try:
-                    weights.append(g.edge[v][ms_node]['weight'])
+                    cost = cost + g.edge[n][ms_node]['weight']
                 except KeyError:
-                    weights.append(g.edge[ms_node][v]['weight'])
+                    cost = cost + g.edge[ms_node][n]['weight']
 
-        # Calc costs
-        edge_cost = sum(weights)
-
-        # Add to cost vector
-        c.append(edge_cost)
+        # Append to cost vector
+        c.append(cost)
 
     return c
+
+
+def ms_event(vertices, graph):
+
+    # ms_event
+    # given 4 nodes find the split or merge vertex that they are connected to
+    #
+    # Inputs:   vertices    - list of 4 node labels
+    #           graph       - graph structure
+    # Outputs:  event_label - label of split/merge node
+    #
+
+    # initialise set
+    num = []
+    event = None
+
+    # split nodes
+    if 'D' in vertices:
+        event = 'M'
+
+        for n in vertices:
+            if 'L' in n:
+                num.append(''.join(i for i in n if i.isdigit()))
+
+    # merge nodes
+    elif 'A' in vertices:
+        event = 'S'
+
+        for n in vertices:
+            if 'R' in n:
+                num.append(''.join(i for i in n if i.isdigit()))
+
+    # Combine to give event label
+    event_label = (event + '(' + num[0] + ',' + num[1] + ')')
+
+    # Check if correct way around
+    if not graph.has_node(event_label):
+        event_label = (event + '(' + num[1] + ',' + num[0] + ')')
+
+    return event_label
+

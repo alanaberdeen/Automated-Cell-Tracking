@@ -159,7 +159,7 @@ def reduce_to_coupled(a_extra, nodelist):
 
 def adjust_capacity_edges(a_dense, nodelist):
 
-    # adjust_capactiy_edges
+    # adjust_capacity_edges
     # Account for the larger capacity edges in the graph by appending the
     # specific edges to the matrix the required amount of times.
     #
@@ -179,10 +179,10 @@ def adjust_capacity_edges(a_dense, nodelist):
     r_nodes = sum(1 for x in couple_vertices if 'R' in x)
 
     # Edge indices connected to nodes
-    source_e = np.nonzero(a_dense[couple_vertices.index('T+'),:])[1]
-    a_e = np.nonzero(a_dense[couple_vertices.index('A'),:])[1]
-    d_e = np.nonzero(a_dense[couple_vertices.index('D'),:])[1]
-    sink_e = np.nonzero(a_dense[couple_vertices.index('T-'),:])[1]
+    source_e = np.nonzero(a_dense[couple_vertices.index('T+'), :])[1]
+    a_e = np.nonzero(a_dense[couple_vertices.index('A'), :])[1]
+    d_e = np.nonzero(a_dense[couple_vertices.index('D'), :])[1]
+    sink_e = np.nonzero(a_dense[couple_vertices.index('T-'), :])[1]
 
     # Edges
     source_a = set(source_e).intersection(a_e).pop()
@@ -191,7 +191,7 @@ def adjust_capacity_edges(a_dense, nodelist):
 
     # Add Edges appropriate number of times
     for x in xrange(1, r_nodes):
-        a_cap = np.hstack((a_cap, a_cap[:,source_a]))
+        a_cap = np.hstack((a_cap, a_cap[:, source_a]))
 
     for x in xrange(1, l_nodes):
         a_cap = np.hstack((a_cap, a_cap[:, a_d]))

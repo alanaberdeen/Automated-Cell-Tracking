@@ -16,7 +16,7 @@ parent = os.path.abspath(os.path.join(cwd, '../../'))
 # --------
 # Quick test path variables for comparison
 # Test1
-images = parent + '/test_datasets/Fluo-N2DH-SIM/01_GT/SEG'
+images = parent + '/test_datasets/Fluo-N2DH-SIM/01_GT/SEG_test'
 # Test2
 #images = parent + '/test_datasets/PhC-C2DH-U373/01_GT/SEG'
 
@@ -30,6 +30,6 @@ for f in previous_saves:
 # Profile
 command = 'track.track_cmcf(images, save, annotated=True, csv=True)'
 test_profile = cProfile.runctx(command, globals(), locals(),
-                               filename='test_profile_v2')
+                               filename='test_profile_10_30')
 
 

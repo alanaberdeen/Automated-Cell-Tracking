@@ -67,8 +67,8 @@ def track_cmcf(img_path, save_path=None, annotated=None, csv=None):
 
             # print output for quick testing 
             print('Frame number: ' + str(i))
-            for cell_id, line in enumerate(output_data):
-                print(('cell id ' + str(cell_id) + ' ---> '), line)
+            #for cell_id, line in enumerate(output_data):
+            #   print(('cell id ' + str(cell_id) + ' ---> '), line)
 
             # If required, annotate images
             if annotated:

@@ -74,9 +74,8 @@ def model_construct(a_coup, b_flow, c_cost):
                                  doc='Flow Constraints')
 
     # Define Objective
-    def objective_rule(model):
-        return sum(model.c[j]*model.x[j] for j in model.j)
-    model.objective = Objective(rule=objective_rule, sense=minimize,
+    obj_expr = sum(model.c[j]*model.x[j] for j in model.j)
+    model.objective = Objective(expr=obj_expr, sense=minimize,
                                 doc='Define objective function')
 
     return model

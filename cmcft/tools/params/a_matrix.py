@@ -18,6 +18,7 @@ def a_matrix(g):
     # couple_matrix
     # Construct coupled graph matrix from graph structure
     #
+    #
     # Inputs:   g           -   current graph structure
     #
     # Outputs:  a_coup      -   coupled incidence matrix
@@ -36,7 +37,11 @@ def a_matrix(g):
     edges_to_add = build_coupled_edges(g, nodelist)
 
     # Add edges to matrix
-    a_extra = np.hstack((a_dense, edges_to_add))
+    try:
+        a_extra = np.hstack((a_dense, edges_to_add))
+    except ValueError:
+        print('No edges to couple in this frame')
+        a_extra = a_dense
 
     # Remove split/merge vertices and previously associated edges
     a_reduce = reduce_to_coupled(a_extra, nodelist)
@@ -75,10 +80,8 @@ def build_coupled_edges(g, nodelist):
             for c in cycle_set:
                 coupled_edge = list(fixed_edge)
                 coupled_edge[nodelist.index(c[0])] = c[1]
-                try:
-                    new_edges.append(coupled_edge)
-                except UnboundLocalError:
-                    new_edges = list(coupled_edge)
+
+                new_edges.append(coupled_edge)
 
     new_array = np.asarray(new_edges)
     new_array = np.transpose(new_array)

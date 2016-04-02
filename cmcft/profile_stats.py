@@ -7,6 +7,6 @@
 
 import pstats
 
-stats = pstats.Stats('track_profile_05')
-stats.sort_stats('tottime', 'cumtime')
-stats.print_stats(10)
+stats = pstats.Stats('track_profile')
+stats.sort_stats('cumtime', 'tottime')
+stats.print_stats('cmcft', 10)

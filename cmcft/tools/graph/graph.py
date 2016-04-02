@@ -59,7 +59,7 @@ def extract_cell_stats(img1_path, img2_path):
     # Outputs:  out -   dict containing the relevant information
     #
 
-    # TODO: be more accommodating with image types, RGB etc
+    # TODO: be more accommodating with image types, RGB etc, tifffile warning
     # read image data
     img1 = skimage.io.imread(img1_path)
     img2 = skimage.io.imread(img2_path)
@@ -73,7 +73,7 @@ def extract_cell_stats(img1_path, img2_path):
     l_label, l_cell_total = label(img1, return_num=True)
     r_label, r_cell_total = label(img2, return_num=True)
 
-    # Collect cell features is cell is of minimum size (not segmented debris)
+    # Collect cell features if cell is of minimum size (not segmented debris)
     # TODO: clever way of setting this number
     l_cells = [cell for cell in regionprops(l_label) if cell['filled_area'] > 50]
     r_cells = [cell for cell in regionprops(r_label) if cell['filled_area'] > 50]

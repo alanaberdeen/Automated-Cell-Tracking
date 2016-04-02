@@ -131,8 +131,7 @@ def extract_num(node_label):
     # extract_node_number
     # Extract the node numbers from the cell label as a set
     #
-    # Inputs: node_label    -  node label (string)
-    #
+    # Inputs: node_label    - node label (string)
     # Outputs: numbers      - set of node numbers in label
     #
 

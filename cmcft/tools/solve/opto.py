@@ -67,9 +67,16 @@ def model_construct(a_coup, b_flow, c_cost):
     model.x = Var(model.j, domain=Binary,
                   doc='solution vector 1 if column is included 0 otherwise')
 
-    # Define constraints
+    # Define constraints - slightly modified from paper because no source/sink
     def flow_rule(model, i):
-        return sum(model.a[i, j]*model.x[j] for j in model.j) <= model.b[i]
+        # for the L and R nodes we need to ensure exact flow
+        if -1 <= model.b[i] <= 1:
+            flow = sum(model.a[i, j]*model.x[j] for j in model.j) == model.b[i]
+        # but the appear/disappear nodes are more flexible
+        else:
+            flow = sum(model.a[i, j]*model.x[j] for j in model.j) <= model.b[i]
+        return flow
+
     model.constrain = Constraint(model.i, rule=flow_rule,
                                  doc='Flow Constraints')
 

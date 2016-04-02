@@ -24,6 +24,7 @@ def b_flow(a_vertices):
 
     # Total Cells
     l_cells = sum(1 for x in a_vertices if 'L' in x)
+    r_cells = sum(1 for x in a_vertices if 'R' in x)
 
     # run through nodes and adjust flow for source/drain
     for node in a_vertices:
@@ -32,7 +33,7 @@ def b_flow(a_vertices):
         elif 'R' in node:
             b.append(1)
         elif 'A' in node:
-            b.append(l_cells * (-1))
+            b.append(r_cells * (-1))
         elif 'D' in node:
             b.append(l_cells)
         else:

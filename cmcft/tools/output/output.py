@@ -177,6 +177,9 @@ def reduce_a(a, x):
     # Extract edges to delete from solution
     included_edges = [j for j in xrange(len(x)) if x[j].value == 1]
 
+    if not included_edges:
+        raise ValueError('Optimiser did not find a solution')
+
     # Remove edges not included from incidence matrix
     a_reduced = a[:, included_edges]
     a_sol = a_reduced.tolist()

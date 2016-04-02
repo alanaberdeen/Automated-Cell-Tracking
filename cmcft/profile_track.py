@@ -14,7 +14,7 @@ import cProfile
 cwd = os.getcwd()
 parent = os.path.abspath(os.path.join(cwd, '../../'))
 
-images = parent + '/test_datasets/Fluo-N2DH-SIM/01_GT/SEG'
+images = parent + '/test_datasets/Fluo-N2DH-SIM/01_GT/SEG_test'
 
 # Setup save directory
 save = parent + '/test_datasets/test_results'
@@ -23,6 +23,6 @@ for f in previous_saves:
     os.remove(f)
 
 # Profile
-command = 'track.track(images, save_path=save, annotated=True)'
+command = 'track.track(images, save_path=save, annotated=True, csv=True)'
 test_profile = cProfile.runctx(command, globals(), locals(),
-                               filename='track_profile')
+                               filename='track_profile_03')

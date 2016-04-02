@@ -51,10 +51,7 @@ def track(img_path, w=110, prune=(0.5, 0.2),
             r_img = img_files[i+1]
 
             # Initialise graph
-            g = graph.construct(l_img, r_img, w=w, beta=prune[1])
-
-            # Prune graph
-            g = graph.prune(g, alpha=prune[0])
+            g = graph.construct(l_img, r_img, w=w, prune=prune)
 
             # Initialise output
             if not output_data:

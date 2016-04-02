@@ -12,7 +12,7 @@ import edges
 import nodes
 
 
-def construct(img1_path, img2_path, w, beta):
+def construct(img1_path, img2_path, w, prune):
 
     # graph
     # Create the graph structure representing the relationships between cells
@@ -21,7 +21,9 @@ def construct(img1_path, img2_path, w, beta):
     # Inputs:   img1_path   - path to first image
     #           img2_path   - path to following image
     #           w           - feature weights (set empirically)
-    #           beta        - fraction of split/merge events to retain
+    #           prune       - pruning parameters, tuple (alpha, beta)
+    #                         alpha - fraction of lowest cost edges to retain
+    #                         beta - fraction of lowest cost nodes to retain
     #
     # Outputs:  g           - graphical representation of potential cell
     #                         behaviour.
@@ -37,10 +39,10 @@ def construct(img1_path, img2_path, w, beta):
     g.graph['img_shape'] = cell_stats['img_shape']
 
     # Add nodes
-    g = nodes.build(g, cell_stats['img1'], cell_stats['img2'], beta)
+    g = nodes.build(g, cell_stats['img1'], cell_stats['img2'], prune[1])
 
     # add edges
-    g = edges.build(g, w)
+    g = edges.build(g, w, prune[0])
 
     # return g
     return g

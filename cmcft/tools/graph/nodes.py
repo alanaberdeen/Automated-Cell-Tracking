@@ -47,11 +47,6 @@ def build(g, l_cells, r_cells, beta):
     g.add_nodes_from(r_nodes.iteritems())
 
     # --------
-    # Source, drain, appear and disappear nodes always exist
-    fixed_n = ['T+', 'T-']
-    g.add_nodes_from(fixed_n)
-
-    # --------
     # Appear
     appear_area = sum(node[1]['area'] for node in r_nodes.iteritems())/len(r_nodes)
     g.add_node('A', area=appear_area)

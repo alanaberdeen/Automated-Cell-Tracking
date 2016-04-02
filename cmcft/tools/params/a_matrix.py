@@ -175,25 +175,16 @@ def adjust_capacity_edges(a_dense, nodelist):
 
     # Total nodes
     l_nodes = sum(1 for x in couple_vertices if 'L' in x)
-    r_nodes = sum(1 for x in couple_vertices if 'R' in x)
 
     # Edge indices connected to nodes
-    source_e = np.nonzero(a_dense[couple_vertices.index('T+'), :])[1]
     a_e = np.nonzero(a_dense[couple_vertices.index('A'), :])[1]
     d_e = np.nonzero(a_dense[couple_vertices.index('D'), :])[1]
-    sink_e = np.nonzero(a_dense[couple_vertices.index('T-'), :])[1]
 
     # Edges
-    source_a = set(source_e).intersection(a_e).pop()
     a_d = set(a_e).intersection(d_e).pop()
-    d_sink = set(d_e).intersection(sink_e).pop()
 
     # Add Edges appropriate number of times
-    for x in xrange(1, r_nodes):
-        a_cap = np.hstack((a_cap, a_cap[:, source_a]))
-
     for x in xrange(1, l_nodes):
         a_cap = np.hstack((a_cap, a_cap[:, a_d]))
-        a_cap = np.hstack((a_cap, a_cap[:, d_sink]))
 
     return a_cap

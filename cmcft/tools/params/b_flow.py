@@ -10,24 +10,33 @@ def b_flow(a_vertices):
     #
     # Construct flow constraint vector
     # (vector of size |V| x 1 representing the sum of flow for each vertex.
-    # 0 for all vertices expect for source and sink)
+    # Having removed source and drain nodes. Now require:
+    # L nodes = -1
+    # R nodes = +1
+    # A node = -|L|
+    # D node = +|L|
     #
-    # Inputs:   g       -   current graph structure
-    # Outputs:  b_flow  -   flow constraint vector.
+    # Inputs:   a_vertices  - order of nodes in coupled matrix
+    # Outputs:  b_flow      -   flow constraint vector.
     #
 
     b = []
 
     # Total Cells
-    total_cells = sum(1 for x in a_vertices if 'L' in x or 'R' in x)
+    l_cells = sum(1 for x in a_vertices if 'L' in x)
 
     # run through nodes and adjust flow for source/drain
     for node in a_vertices:
-        if node == 'T+':
-            b.append((-1)*total_cells)
-        elif node == 'T-':
-            b.append(total_cells)
-        elif 'M' not in node and 'S' not in node:
-            b.append(0)
+        if 'L' in node:
+            b.append(-1)
+        elif 'R' in node:
+            b.append(1)
+        elif 'A' in node:
+            b.append(l_cells * (-1))
+        elif 'D' in node:
+            b.append(l_cells)
+        else:
+            print("Coupling matrix problems, there "
+                  "remain split/merge vertices")
 
     return b

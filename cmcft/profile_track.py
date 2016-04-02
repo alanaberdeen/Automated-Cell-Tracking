@@ -26,3 +26,5 @@ for f in previous_saves:
 command = 'track.track(images, save_path=save, annotated=False, csv=False, prune=(0.25, 0.2))'
 test_profile = cProfile.runctx(command, globals(), locals(),
                                filename='track_profile')
+
+# TODO: pyomo interface is slowing things down. Declaration of constraints.

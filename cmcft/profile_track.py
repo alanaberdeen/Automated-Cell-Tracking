@@ -23,6 +23,6 @@ for f in previous_saves:
     os.remove(f)
 
 # Profile
-command = 'track.track(images, save_path=save, annotated=True, csv=True)'
+command = 'track.track(images, save_path=save, annotated=False, csv=False)'
 test_profile = cProfile.runctx(command, globals(), locals(),
-                               filename='track_profile_03')
+                               filename='track_profile_05')

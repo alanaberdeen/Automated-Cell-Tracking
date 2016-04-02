@@ -40,13 +40,6 @@ def build(g_in, w, alpha):
     # ------------------------------------------------------------------------
     # Running through the sets, build the edges.
 
-    # -----
-    # FROM source node
-    for n in node_sets['l_n']:
-        g_in.add_edge('T+', n, weight=dummy_cost)
-
-    g_in.add_edge('T+', 'A', weight=dummy_cost)
-
     #
     # -----
     # FROM split edges
@@ -151,15 +144,6 @@ def build(g_in, w, alpha):
     # Prune and add subset of edges to graph
     edges_to_add = prune_set(disappear_edges, alpha=alpha)
     g_in.add_weighted_edges_from(edges_to_add)
-
-    # -----
-    # TO sink edges
-    # from R nodes
-    for r_node in node_sets['r_n']:
-        g_in.add_edge(r_node, 'T-', weight=dummy_cost)
-
-    # from disappear node
-    g_in.add_edge('D', 'T-', weight=dummy_cost)
 
     # ------------------------------------------------------------------------
     # prepare output

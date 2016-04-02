@@ -69,10 +69,10 @@ def model_construct(a_coup, b_flow, c_cost):
 
     # Define constraints - slightly modified from paper because no source/sink
     def flow_rule(model, i):
-        # for the L and R cells we need to ensure exact flow
+        # for the L and R nodes we need to ensure exact flow
         if -1 <= model.b[i] <= 1:
             flow = sum(model.a[i, j]*model.x[j] for j in model.j) == model.b[i]
-        # otherwise we can be more flexible
+        # but the appear/disappear nodes are more flexible
         else:
             flow = sum(model.a[i, j]*model.x[j] for j in model.j) <= model.b[i]
         return flow

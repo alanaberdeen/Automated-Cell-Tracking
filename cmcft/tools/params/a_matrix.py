@@ -37,7 +37,11 @@ def a_matrix(g):
     edges_to_add = build_coupled_edges(g, nodelist)
 
     # Add edges to matrix
-    a_extra = np.hstack((a_dense, edges_to_add))
+    try:
+        a_extra = np.hstack((a_dense, edges_to_add))
+    except ValueError:
+        print('No edges to couple in this frame')
+        a_extra = a_dense
 
     # Remove split/merge vertices and previously associated edges
     a_reduce = reduce_to_coupled(a_extra, nodelist)

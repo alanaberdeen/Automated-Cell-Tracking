@@ -18,6 +18,7 @@ def a_matrix(g):
     # couple_matrix
     # Construct coupled graph matrix from graph structure
     #
+    #
     # Inputs:   g           -   current graph structure
     #
     # Outputs:  a_coup      -   coupled incidence matrix
@@ -75,10 +76,8 @@ def build_coupled_edges(g, nodelist):
             for c in cycle_set:
                 coupled_edge = list(fixed_edge)
                 coupled_edge[nodelist.index(c[0])] = c[1]
-                try:
-                    new_edges.append(coupled_edge)
-                except UnboundLocalError:
-                    new_edges = list(coupled_edge)
+
+                new_edges.append(coupled_edge)
 
     new_array = np.asarray(new_edges)
     new_array = np.transpose(new_array)

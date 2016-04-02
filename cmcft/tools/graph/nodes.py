@@ -28,32 +28,40 @@ def build(g, l_cells, r_cells, beta):
     # --------
     # Cells in previous image
     l_nodes = {}
+    l_area_sum = 0
     for cell in l_cells:
         label = 'L' + str(len(l_nodes))
         centroid = (int(cell.centroid[0]), int(cell.centroid[1]))
         l_nodes[label] = {'centroid': centroid,
                           'area': cell.filled_area}
 
+        # keep track of l cell area sum
+        l_area_sum = l_area_sum + cell.filled_area
+
     g.add_nodes_from(l_nodes.iteritems())
 
     # Cells in current image
     r_nodes = {}
+    r_area_sum = 0
     for cell in r_cells:
         label = 'R' + str(len(r_nodes))
         centroid = (int(cell.centroid[0]), int(cell.centroid[1]))
         r_nodes[label] = {'centroid': centroid,
                           'area': cell.filled_area}
 
+        # keep track of r cell area sum
+        r_area_sum = r_area_sum + cell.filled_area
+
     g.add_nodes_from(r_nodes.iteritems())
 
     # --------
     # Appear
-    appear_area = sum(node[1]['area'] for node in r_nodes.iteritems())/len(r_nodes)
+    appear_area = l_area_sum/len(r_nodes)
     g.add_node('A', area=appear_area)
 
     # --------
     # Disappear
-    disappear_area = sum(node[1]['area'] for node in l_nodes.iteritems())/len(l_nodes)
+    disappear_area = r_area_sum/len(l_nodes)
     g.add_node('D', area=disappear_area)
 
     # --------

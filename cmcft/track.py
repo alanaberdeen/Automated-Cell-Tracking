@@ -9,7 +9,7 @@ import glob
 from tools import solve, output, graph, params
 
 
-def track(img_path, w=110, prune=(0.5, 0.2),
+def track(img_path, w=110, prune=(0.25, 0.2),
           save_path=None, annotated=False, csv=False):
 
     # track

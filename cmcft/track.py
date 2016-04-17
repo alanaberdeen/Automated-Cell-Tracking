@@ -10,7 +10,7 @@ from tools import solve, output, graph, params
 
 
 def track(img_path, w=110, prune=(0.25, 0.2),
-          save_path=None, annotated=False, csv=False):
+          save_path=None, annotated=False, csv=False, json=False):
 
     # track
     # tracking function. Loops through sets of image files. For each pair,
@@ -25,6 +25,7 @@ def track(img_path, w=110, prune=(0.25, 0.2),
     #           save_path   -  path to directory for saved output
     #           annotated   -  option to save annotated images of cell tracks
     #           csv         -  option to save csv of output
+    #           json        -  option to save JSON of output
     #
     #
     # Outputs:  tracks      -  Output data structure for cell tracks.
@@ -80,5 +81,8 @@ def track(img_path, w=110, prune=(0.25, 0.2),
     # If required, save output as csv
     if csv:
         output.save_csv(output_data, save_path)
+
+    if json:
+        output.save_json(output_data, save_path)
 
     return output_data

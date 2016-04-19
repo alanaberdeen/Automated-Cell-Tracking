@@ -1,5 +1,7 @@
-# import external packages
-import numpy as np
+# output
+# functions to manage the output of optimiser
+
+import collections
 
 
 def update(g, a_matrix, x, out, c_vertices):
@@ -21,12 +23,12 @@ def update(g, a_matrix, x, out, c_vertices):
 
     # Check if first output, else associate L cells with tracks
     if not out:
-        out = initialise(g.node)
+        out = initialise_out(g.node)
     else:
-        out = label_previous(g.node, out)
+        label_previous(g.node, out)
 
     # Update frame number
-    frame = out[0][0][-1] + 1
+    out['frame'] += 1
 
     # Update connections
     for row, vertex in enumerate(c_vertices):
@@ -34,9 +36,7 @@ def update(g, a_matrix, x, out, c_vertices):
         # Find new cells and the edge going TO that cell
         if 'R' in vertex:
 
-            checker = len([i for i in a_sol[row] if i == 1])
             edge = a_sol[row].index(1)
-            y = 1
 
             # Find labels for predecessors
             predecessors = [c_vertices[i] for i, v in enumerate(a_sol) if v[edge] == -1]
@@ -47,56 +47,42 @@ def update(g, a_matrix, x, out, c_vertices):
 
                 # Cell moved
                 if 'L' in previous:
-                    out = update_move(out, vertex, previous, g.node)
+                    update_cell_data(out, vertex, previous, g.node)
 
                 # Cell appeared
                 elif 'A' in previous:
-                    out = update_appear(out, vertex, g.node, frame)
+                    update_appear(out, vertex, g.node)
 
             # Cell from split/merge
             elif len(predecessors) > 1:
-                out = update_split_merge(out, vertex, g.node, frame, predecessors)
-
-    # Make all tracks up to same length by appending None
-    out = update_to_frame(out, frame)
+                update_split_merge(out, vertex, g.node, predecessors)
 
     return out
 
 
-def update_move(current_out, vertex, previous, g_nodes):
+def update_cell_data(out, vertex, previous, g_nodes):
 
-    # update_move
-    # Update output for simple cell movements.
+    # update_cell_data
+    # Update output with cell data
     #
-    # inputs:   current_out     - current output data (list of lists)
+    # inputs:   out     - current output data (list of lists)
     #           vertex          - label for new cell data (string)
     #           previous        - label for previous cell data (string)
     #           g_nodes         - nodes in graph with attributes
-    #
-    # outputs   updated_out - updated output structure
 
     # find output row
-    for cell in current_out:
-        if cell[4] == previous:
+    for cell_id, data in out['tracks'].iteritems():
+        if data['previous'] == previous:
 
-            # Update frame number
-            cell[0].append(cell[0][-1]+1)
+            for key, value in data.iteritems():
+                if key == 'frame':
+                    data['frame'].append((data['frame'][-1] + 1))
 
-            # Append Centroid as tuple
-            cell[1].append(g_nodes[vertex]['centroid'])
-
-            # Append Area
-            cell[2].append(g_nodes[vertex]['area'])
-
-            # Append parent ID(s)
-            cell[3].append(None)
-
-    # return output
-    updated_out = current_out
-    return updated_out
+                elif isinstance(data[key], list):
+                    data[key].append(g_nodes[vertex][key])
 
 
-def update_appear(current_out, vertex, g_nodes, frame, parent_id=None):
+def update_appear(current_out, vertex, g_nodes):
 
     # update_appear
     # Update output for cell appearances
@@ -106,35 +92,20 @@ def update_appear(current_out, vertex, g_nodes, frame, parent_id=None):
     #           g_nodes         - nodes in graph with associated attributes
     #           parent_id       - parent cell labels (if any)
     #
-    # Outputs   updated_out - updated output structure
 
-    # Initialise new cmcft with current frames and data structure
-    new_cell_track = [[x for x in range(frame)],
-                     [None] * frame,
-                     [None] * frame,
-                     [None] * frame,
-                      None]
+    # Initialise data structure for new track
+    new_cell_track = initialise_track(vertex, g_nodes[vertex])
+    cell_id = len(current_out['tracks'])
+    new_cell_track['cell_id'] = cell_id
+
+    # Adjust frame to moment appeared
+    new_cell_track['frame'] = [current_out['frame']]
 
     # Add to output
-    updated_out = list(current_out)
-    updated_out.append(new_cell_track)
-
-    # Update frame
-    updated_out[-1][0].append(updated_out[-1][0][-1] + 1)
-
-    # Append centroid
-    updated_out[-1][1].append(g_nodes[vertex]['centroid'])
-
-    # Append area
-    updated_out[-1][2].append(g_nodes[vertex]['area'])
-
-    # Append parent ID(s)
-    updated_out[-1][3].append(parent_id)
-
-    return updated_out
+    current_out['tracks'][cell_id] = new_cell_track
 
 
-def update_split_merge(current_out, vertex, g_nodes, frame, predecessors):
+def update_split_merge(current_out, vertex, g_nodes, predecessors):
 
     # update_split_merge
     # Update output data structure for split/merge event
@@ -147,19 +118,24 @@ def update_split_merge(current_out, vertex, g_nodes, frame, predecessors):
     # outputs   updated_out - updated output structure
     #
 
-    # Initialise parents
+    # Add new cell track to output
+    update_appear(current_out, vertex, g_nodes)
+
+    # cell_id of new cell
+    cell_id = len(current_out['tracks']) - 1
+
+    # Record the parent cell_IDs
     parent_ids = []
 
-    # find the cell ID (row in output array) of the parent cell
+    # find the cell ID of the parent cell
     for parent in predecessors:
         if 'L' in parent:
-            for cell_id, data in enumerate(current_out):
-                if data[4] == parent:
-                    parent_ids.append(cell_id)
+            for cell_id, data in current_out['tracks'].iteritems():
+                if data['previous'] == parent:
+                    parent_ids.append(data['cell_id'])
 
-    updated_out = update_appear(current_out, vertex, g_nodes, frame, parent_ids)
-
-    return updated_out
+    # store as parents
+    current_out['tracks'][cell_id]['parent'] = tuple(parent_ids)
 
 
 def reduce_a(a, x):
@@ -187,57 +163,31 @@ def reduce_a(a, x):
     return a_sol
 
 
-def initialise(g_nodes):
+def initialise_out(g_nodes):
 
     # initialise_out
-    # Function to initialise output format
+    # Function to initialise_out output format
     #
     # inputs:   g   -   current graph structure
     #
     # outputs   out -   out structure
     #
 
-    out = []
+    out = dict()
+    out['frame'] = 0
 
-    for vertex in g_nodes:
-            if 'L' in vertex:
+    tracks = collections.OrderedDict()
 
-                # initialise cell data
-                cell = [list(), list(), list(), list(), 'label']
+    for vertex, data in g_nodes.iteritems():
+        if 'L' in vertex:
 
-                # Frame
-                cell[0].append(0)
+            # initialise_out cell data
+            track = initialise_track(vertex, data)
+            cell_id = len(tracks)
+            track['cell_id'] = cell_id
+            tracks[cell_id] = track
 
-                # Centroid
-                cell[1].append(g_nodes[vertex]['centroid'])
-
-                # Area
-                cell[2].append(g_nodes[vertex]['area'])
-
-                # Parent ID
-                cell[3].append(None)
-
-                # Temp previous label
-                cell[4] = vertex
-
-                out.append(cell)
-
-    return out
-
-
-def update_to_frame(out, frame):
-
-    # for each track check if data up to date
-    for track in out:
-        diff = frame - (len(track[0])-1)
-
-        # if not enough data cell has disappeared, append none to lists.
-        if diff > 0:
-            track[0].append((track[0][-1] + 1))
-            track[1].append(None)
-            track[2].append(None)
-            track[3].append(None)
-            track[4] = None
+    out['tracks'] = tracks
 
     return out
 
@@ -250,18 +200,28 @@ def label_previous(g_nodes, out):
     # Inputs:   g_nodes     - nodes in graph
     #           out         - current out data
     #
-    # Outputs   updated_out - created out structure
-    #
-
-    updated_out = list(out)
 
     # For each L node
     for vertex in g_nodes:
         if 'L' in vertex:
 
             # find track associated and label with cell name
-            for track in updated_out:
-                if track[1][-1] == g_nodes[vertex]['centroid']:
-                    track[4] = vertex
+            for cell_id, data in out['tracks'].iteritems():
+                if cell_id is not 'frame':
+                    if data['centroid'][-1] == g_nodes[vertex]['centroid']:
+                        data['previous'] = vertex
 
-    return updated_out
+
+def initialise_track(vertex, data):
+
+    # initialise_track
+    # initialise track for new cell in output
+
+    track = {'frame': [0],
+             'previous': vertex,
+             'parent': None}
+
+    for key, value in data.iteritems():
+        track[key] = [value]
+
+    return track

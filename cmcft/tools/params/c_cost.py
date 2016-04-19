@@ -67,7 +67,7 @@ def ms_event(vertices, graph):
     # Outputs:  event_label - label of split/merge node
     #
 
-    # initialise set
+    # initialise_out set
     num = []
     event = None
 

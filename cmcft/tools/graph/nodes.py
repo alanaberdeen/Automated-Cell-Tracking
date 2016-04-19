@@ -30,10 +30,10 @@ def build(g, l_cells, r_cells, beta):
     l_nodes = {}
     l_area_sum = 0
     for cell in l_cells:
-        label = 'L' + str(len(l_nodes))
-        centroid = (int(cell.centroid[0]), int(cell.centroid[1]))
-        l_nodes[label] = {'centroid': centroid,
-                          'area': cell.filled_area}
+        label = 'L' + str(len(l_nodes)+1)
+        l_nodes[label] = {'centroid': cell.centroid,
+                          'area': cell.area,
+                          'bbox': cell.bbox}
 
         # keep track of l cell area sum
         l_area_sum = l_area_sum + cell.filled_area
@@ -44,10 +44,10 @@ def build(g, l_cells, r_cells, beta):
     r_nodes = {}
     r_area_sum = 0
     for cell in r_cells:
-        label = 'R' + str(len(r_nodes))
-        centroid = (int(cell.centroid[0]), int(cell.centroid[1]))
-        r_nodes[label] = {'centroid': centroid,
-                          'area': cell.filled_area}
+        label = 'R' + str(len(r_nodes)+1)
+        r_nodes[label] = {'centroid': cell.centroid,
+                          'area': cell.area,
+                          'bbox': cell.bbox}
 
         # keep track of r cell area sum
         r_area_sum = r_area_sum + cell.filled_area
@@ -67,7 +67,7 @@ def build(g, l_cells, r_cells, beta):
     # --------
     # Split nodes
     s_n = []
-    split_into = range(len(r_nodes))
+    split_into = range(1, (len(r_nodes)+1))
     for subset in combinations(split_into, 2):
         label = "S(" + str(subset[0]) + "," + str(subset[1]) + ")"
         cost = event_cost(g, ('R' + str(subset[0])), ('R' + str(subset[1])))
@@ -84,7 +84,7 @@ def build(g, l_cells, r_cells, beta):
     # --------
     # Merge Nodes
     m_n = []
-    merge_from = range(len(l_nodes))
+    merge_from = range(1, (len(l_nodes)+1))
     for subset in combinations(merge_from, 2):
         label = "M" + "(" + str(subset[0]) + "," + str(subset[1]) + ")"
         cost = event_cost(g, ('L' + str(subset[0])), ('L' + str(subset[1])))

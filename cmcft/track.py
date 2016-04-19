@@ -56,7 +56,7 @@ def track(img_path, w=110, prune=(0.25, 0.2),
 
             # Initialise output
             if not output_data:
-                output_data = output.initialise(g.node)
+                output_data = output.initialise_out(g.node)
                 if annotated:
                     output.overlay(output_data, l_img, save_path)
 

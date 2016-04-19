@@ -31,21 +31,10 @@ def save_json(output_data, save_path):
     #           save_path   - dir to save csv inside
     #
 
-    # Convert to sensible format for JSON
-    j_out = dict()
-    for i_d, cell in enumerate(output_data):
-        track = dict()
-        track["Cell_ID"] = i_d
-        track["Frames"] = cell[0]
-        track["Centroid"] = cell[1]
-        track["Area"] = cell[2]
-        track["Parent"] = cell[3]
-
-        j_out["Cell_" + str(i_d)] = track
-
     # Set save path
     save_out = save_path + '/output_data.json'
 
     # Write file
     with open(save_out, 'wb') as outfile:
-        json.dump(j_out, outfile)
+        json.dump(output_data['tracks'],
+                  outfile)

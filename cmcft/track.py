@@ -78,7 +78,8 @@ def track(img_path, w=110, prune=(0.25, 0.2),
             if annotated:
                 output.overlay(output_data, r_img, save_path)
 
-    # If required, save output as csv
+
+    # If required, save output as csv or JSON
     if csv:
         output.save_csv(output_data, save_path)
 

@@ -24,8 +24,9 @@ def update(g, a_matrix, x, out, c_vertices):
     # Check if first output, else associate L cells with tracks
     if not out:
         out = initialise_out(g.node)
-    else:
-        label_previous(g.node, out)
+
+    # Create dict of 'active cells' and their l_labels in previous frame
+    active_cells = label_active(g.node, out)
 
     # Update frame number
     out['frame'] += 1
@@ -43,43 +44,49 @@ def update(g, a_matrix, x, out, c_vertices):
 
             # Simple cell movement
             if len(predecessors) == 1:
-                previous = predecessors.pop()
+                prev = predecessors.pop()
 
                 # Cell moved
-                if 'L' in previous:
-                    update_cell_data(out, vertex, previous, g.node)
+                if 'L' in prev:
+                    update_cell_data(out, vertex, prev, g.node, active_cells)
 
                 # Cell appeared
-                elif 'A' in previous:
+                elif 'A' in prev:
                     update_appear(out, vertex, g.node)
 
             # Cell from split/merge
             elif len(predecessors) > 1:
-                update_split_merge(out, vertex, g.node, predecessors)
+                update_split_merge(out, vertex, g.node, predecessors, active_cells)
 
     return out
 
 
-def update_cell_data(out, vertex, previous, g_nodes):
+def update_cell_data(out, vertex, prev, g_nodes, active_cells):
 
     # update_cell_data
     # Update output with cell data
     #
-    # inputs:   out     - current output data (list of lists)
-    #           vertex          - label for new cell data (string)
-    #           previous        - label for previous cell data (string)
+    # inputs:   out             - current output data
+    #           vertex          - label for new cell data
+    #           prev            - label for prev cell data
     #           g_nodes         - nodes in graph with attributes
+    #           active_cells    - dict of 'active' cells and prev labels
 
     # find output row
-    for cell_id, data in out['tracks'].iteritems():
-        if data['previous'] == previous:
+    for cell_id, l_label in active_cells.iteritems():
+        if l_label == prev:
 
-            for key, value in data.iteritems():
+            # Update cell information
+            features = out['tracks'][cell_id]
+            for key, value in features.iteritems():
+
+                # Append frame number
                 if key == 'frame':
-                    data['frame'].append((data['frame'][-1] + 1))
+                    features['frame'].append((features['frame'][-1] + 1))
 
-                elif isinstance(data[key], list):
-                    data[key].append(g_nodes[vertex][key])
+                # append cell feature data
+                elif isinstance(features[key], list):
+                    features[key].append(g_nodes[vertex][key])
 
 
 def update_appear(current_out, vertex, g_nodes):
@@ -94,7 +101,7 @@ def update_appear(current_out, vertex, g_nodes):
     #
 
     # Initialise data structure for new track
-    new_cell_track = initialise_track(vertex, g_nodes[vertex])
+    new_cell_track = initialise_track(g_nodes[vertex])
     cell_id = len(current_out['tracks'])
     new_cell_track['cell_id'] = cell_id
 
@@ -105,7 +112,7 @@ def update_appear(current_out, vertex, g_nodes):
     current_out['tracks'][cell_id] = new_cell_track
 
 
-def update_split_merge(current_out, vertex, g_nodes, predecessors):
+def update_split_merge(current_out, vertex, g_nodes, predecessors, active_cells):
 
     # update_split_merge
     # Update output data structure for split/merge event
@@ -122,7 +129,7 @@ def update_split_merge(current_out, vertex, g_nodes, predecessors):
     update_appear(current_out, vertex, g_nodes)
 
     # cell_id of new cell
-    cell_id = len(current_out['tracks']) - 1
+    new_id = len(current_out['tracks']) - 1
 
     # Record the parent cell_IDs
     parent_ids = []
@@ -130,12 +137,12 @@ def update_split_merge(current_out, vertex, g_nodes, predecessors):
     # find the cell ID of the parent cell
     for parent in predecessors:
         if 'L' in parent:
-            for cell_id, data in current_out['tracks'].iteritems():
-                if data['previous'] == parent:
-                    parent_ids.append(data['cell_id'])
+            for cell_id, l_label in active_cells.iteritems():
+                if l_label == parent:
+                    parent_ids.append(cell_id)
 
     # store as parents
-    current_out['tracks'][cell_id]['parent'] = tuple(parent_ids)
+    current_out['tracks'][new_id]['parent'] = tuple(parent_ids)
 
 
 def reduce_a(a, x):
@@ -182,7 +189,7 @@ def initialise_out(g_nodes):
         if 'L' in vertex:
 
             # initialise_out cell data
-            track = initialise_track(vertex, data)
+            track = initialise_track(data)
             cell_id = len(tracks)
             track['cell_id'] = cell_id
             tracks[cell_id] = track
@@ -192,14 +199,17 @@ def initialise_out(g_nodes):
     return out
 
 
-def label_previous(g_nodes, out):
+def label_active(g_nodes, out):
 
-    # label_previous
-    # Add labels to tracks that are L cells
+    # label_active
+    # Data structure for cells that are 'active' in the tracking.
+    # Holds what the cell's L label is in the previous image.
     #
     # Inputs:   g_nodes     - nodes in graph
     #           out         - current out data
     #
+
+    active_cells = dict()
 
     # For each L node
     for vertex in g_nodes:
@@ -207,18 +217,18 @@ def label_previous(g_nodes, out):
 
             # find track associated and label with cell name
             for cell_id, data in out['tracks'].iteritems():
-                if cell_id is not 'frame':
-                    if data['centroid'][-1] == g_nodes[vertex]['centroid']:
-                        data['previous'] = vertex
+                if data['centroid'][-1] == g_nodes[vertex]['centroid']:
+                    active_cells[cell_id] = vertex
+
+    return active_cells
 
 
-def initialise_track(vertex, data):
+def initialise_track(data):
 
     # initialise_track
     # initialise track for new cell in output
 
     track = {'frame': [0],
-             'previous': vertex,
              'parent': None}
 
     for key, value in data.iteritems():

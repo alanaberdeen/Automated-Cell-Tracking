@@ -33,7 +33,8 @@ def build(g, l_cells, r_cells, beta):
         label = 'L' + str(len(l_nodes)+1)
         l_nodes[label] = {'centroid': cell.centroid,
                           'area': cell.area,
-                          'bbox': cell.bbox}
+                          'bbox': cell.bbox,
+                          'label': cell.label}
 
         # keep track of l cell area sum
         l_area_sum = l_area_sum + cell.filled_area
@@ -47,7 +48,8 @@ def build(g, l_cells, r_cells, beta):
         label = 'R' + str(len(r_nodes)+1)
         r_nodes[label] = {'centroid': cell.centroid,
                           'area': cell.area,
-                          'bbox': cell.bbox}
+                          'bbox': cell.bbox,
+                          'label': cell.label}
 
         # keep track of r cell area sum
         r_area_sum = r_area_sum + cell.filled_area

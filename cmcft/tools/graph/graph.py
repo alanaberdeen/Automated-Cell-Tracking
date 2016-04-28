@@ -5,6 +5,7 @@
 import networkx as nx
 import skimage.io
 from skimage.measure import label, regionprops
+from skimage.morphology import remove_small_objects
 import warnings
 
 # Import functions
@@ -69,14 +70,18 @@ def extract_cell_stats(img1_path, img2_path):
         warnings.warn('Caution: Comparing image frames of different sizes.')
     img_shape = img1.shape
 
-    # Label pre-segmented images
-    l_label, l_cell_total = label(img1, return_num=True)
-    r_label, r_cell_total = label(img2, return_num=True)
+    # remove mis-segmented debris
+    # TODO: clever way of setting min_size
+    img1_clean = remove_small_objects(label(img1), min_size=50)
+    img2_clean = remove_small_objects(label(img2), min_size=50)
 
-    # Collect cell features if cell is of minimum size (not segmented debris)
-    # TODO: clever way of setting this number
-    l_cells = [cell for cell in regionprops(l_label) if cell['filled_area'] > 50]
-    r_cells = [cell for cell in regionprops(r_label) if cell['filled_area'] > 50]
+    # Label pre-segmented images
+    l_label, l_cell_total = label(img1_clean, return_num=True)
+    r_label, r_cell_total = label(img2_clean, return_num=True)
+
+    # Collect cell features
+    l_cells = [cell for cell in regionprops(l_label)]
+    r_cells = [cell for cell in regionprops(r_label)]
 
     # Output
     out = {'img1': l_cells, 'img2': r_cells, 'img_shape': img_shape}

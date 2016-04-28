@@ -1,5 +1,4 @@
-# track_errors.py
-#
+# tests.py
 # Collection of functions to error check the tracking output.
 #
 #
@@ -16,7 +15,7 @@ def read_json(path):
     # Outputs:  output  - output python object
     #
 
-    with open('output_data.json') as data_file:
+    with open(path) as data_file:
         data = json.load(data_file, encoding="utf-8")
 
     return data

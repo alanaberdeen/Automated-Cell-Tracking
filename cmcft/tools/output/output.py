@@ -108,6 +108,12 @@ def update_appear(current_out, vertex, g_nodes):
     # Adjust frame to moment appeared
     new_cell_track['frame'] = [current_out['frame']]
 
+    # Adjust parent to indicate appearance
+    new_cell_track['parent'] = 'A'
+
+    # Adjust color for visualisation
+    new_cell_track['color'] = '#859900'
+
     # Add to output
     current_out['tracks'][cell_id] = new_cell_track
 
@@ -143,6 +149,14 @@ def update_split_merge(current_out, vertex, g_nodes, predecessors, active_cells)
 
     # store as parents
     current_out['tracks'][new_id]['parent'] = tuple(parent_ids)
+
+    # update visual color
+    # for merge
+    if len(parent_ids) > 1:
+        current_out['tracks'][new_id]['color'] = '#6c71c4'
+    # for splits
+    else:
+        current_out['tracks'][new_id]['color'] = '#2aa198'
 
 
 def reduce_a(a, x):
@@ -229,7 +243,8 @@ def initialise_track(data):
     # initialise track for new cell in output
 
     track = {'frame': [0],
-             'parent': None}
+             'parent': None,
+             'color': '#839496'}
 
     for key, value in data.iteritems():
         track[key] = [value]

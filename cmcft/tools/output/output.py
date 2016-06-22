@@ -154,9 +154,12 @@ def update_split_merge(current_out, vertex, g_nodes, predecessors, active_cells)
     # for merge
     if len(parent_ids) > 1:
         current_out['tracks'][new_id]['color'] = '#6c71c4'
+        current_out['tracks'][parent_ids[0]]['termination'] = 'M'
+        current_out['tracks'][parent_ids[1]]['termination'] = 'M'
     # for splits
     else:
         current_out['tracks'][new_id]['color'] = '#2aa198'
+        current_out['tracks'][parent_ids[0]]['termination'] = 'S'
 
 
 def reduce_a(a, x):
@@ -244,7 +247,8 @@ def initialise_track(data):
 
     track = {'frame': [0],
              'parent': None,
-             'color': '#839496'}
+             'color': '#839496',
+             'termination': 'D'}
 
     for key, value in data.iteritems():
         track[key] = [value]

@@ -24,7 +24,6 @@ command = 'track.track(images, save_path=save, csv=False, prune=(0.25, 0.2), jso
 test_profile = cProfile.runctx(command, globals(), locals(), filename='track_profile')
 # TODO: pyomo interface is slowing things down. Declaration of constraints.
 
-
 # annotate tracks
 file = save + '/output_data.json'
 save_annotate = parent + '/test_datasets/test_results/overlay/'

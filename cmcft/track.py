@@ -9,7 +9,7 @@ import glob
 from tools import solve, output, graph, params
 
 
-def track(img_path, w=110, prune=(0.25, 0.2),
+def track(img_path, w=110, prune=(0.25, 0.25),
           save_path=None, csv=False, json=False):
 
     # track
@@ -76,6 +76,6 @@ def track(img_path, w=110, prune=(0.25, 0.2),
         output.save_csv(output_data, save_path)
 
     if json:
-        output.save_json(output_data, save_path)
+        output.save_json(output_data, save_path, img_path)
 
     return output_data

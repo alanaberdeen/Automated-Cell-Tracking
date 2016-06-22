@@ -57,7 +57,7 @@ def build(g_in, w, alpha):
         # TO R nodes
         merge_edges = []
         for r_node in node_sets['r_n']:
-            cost = w * merge_cost(g_in.node, r_node, m_node)
+            cost = w * merge_cost(g_in.node, r_node, m_node) * 10
             merge_edges.append((m_node, r_node, cost))
 
         # Prune and add subset of edges to graph
@@ -86,7 +86,7 @@ def build(g_in, w, alpha):
         # Feature costs: Movement and Change in Area
         move_c = w * dist_border
         area_c = w * area_diff(g_in.node[r_node]['area'], g_in.node['A']['area'])
-        cost = int(area_c + move_c)
+        cost = int(area_c + move_c) * 1
 
         appear_edges.append(('A', r_node, cost))
 

@@ -22,7 +22,7 @@ def save_csv(output_data, save_path):
         writer.writerows(output_data)
 
 
-def save_json(output_data, save_path):
+def save_json(output_data, save_path, img_path):
 
     # save_json
     # save tracking output to json file
@@ -32,7 +32,7 @@ def save_json(output_data, save_path):
     #
 
     # Set save path
-    save_out = save_path + '/output_data.json'
+    save_out = save_path + '/' + img_path[-3:] + '_tracked.json'
 
     # Write file
     with open(save_out, 'wb') as outfile:

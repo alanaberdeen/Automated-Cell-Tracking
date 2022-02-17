@@ -3,7 +3,7 @@ decorator==4.0.9
 networkx==1.11
 nose==1.3.7
 numpy==1.11.0
-Pillow==8.1.1
+Pillow==9.0.0
 ply==3.8
 Pyomo==4.2.10784
 PyUtilib==5.2.3601

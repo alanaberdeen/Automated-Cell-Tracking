@@ -1,8 +1,11 @@
 # README
+
 (c) 2016   
 Author: Alan Aberdeen   
 Email: alanaberdeen (at) gmail (dot) com
 
+## Archive
+This repository is archived and not actively maintained.
 
 ## Intention   
 Python implementation of the tracking methodology as presented in:  
